@@ -1,3 +1,5 @@
 # KDV_AI_Team
- local repos
-Hey Y'all, so I just made this private github repo so we could do our mini project. :) 
+
+We built a basic React-Native mobile app using Expo.
+
+The app is able to upload, display and share images from the phone's library.
