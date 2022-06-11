@@ -1,3 +1,3 @@
 # KDV_AI_Team
 
-The AI Explore Intern GitHub Repos
+The AI Explore Intern GitHub Repo
