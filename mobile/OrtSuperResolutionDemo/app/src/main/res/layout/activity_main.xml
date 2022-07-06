@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:background="@color/blue_dark"
+    >
+
+
+    <androidx.fragment.app.FragmentContainerView
+        android:layout_width="350dp"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:layout_gravity="center"
+        android:layout_marginBottom="4dp"
+        android:id="@+id/lowImgView"
+        android:name="com.example.ortsuperresolutiondemo.ImageViewerFragment"
+        tools:layout="@layout/fragment_image_viewer"
+        />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:layout_width="350dp"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:layout_gravity="center"
+        android:layout_marginBottom="4dp"
+        android:id="@+id/highImgView"
+        android:name="com.example.ortsuperresolutiondemo.ImageViewerFragment"
+        tools:layout="@layout/fragment_image_viewer"
+        />
+
+<!--    <androidx.fragment.app.FragmentContainerView-->
+<!--        android:layout_width="350dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="3"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:layout_marginBottom="4dp"-->
+<!--        android:id="@+id/imageClassView"-->
+<!--        android:name="com.example.ortsuperresolutiondemo.ImageViewerFragment"-->
+<!--        tools:layout="@layout/fragment_image_viewer"-->
+<!--        />-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/blue_light"
+        />
+
+
+    <androidx.fragment.app.FragmentContainerView
+        android:background="@color/material_dynamic_neutral10"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="2dp"
+        android:layout_weight="3"
+        android:id="@+id/input_controls"
+        android:name="com.example.ortsuperresolutiondemo.UserInputFragment"
+        tools:layout="@layout/user_input_fragment"
+        />
+
+
+</LinearLayout>

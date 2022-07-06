@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Super Resolution Demo</string>
+    <string name="load_the_model">Load the Model</string>
+    <string name="model_shape">Model Shape</string>
+    <string name="run_the_model">Run The Model</string>
+    <string name="upload_image">Upload Image</string>
+</resources>

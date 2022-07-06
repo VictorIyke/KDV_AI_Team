@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="top"
+    android:padding="16dp">
+
+
+
+    <Button
+        android:id="@+id/uploadImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/upload_image"
+        android:layout_gravity="center"
+        android:padding="16dp"
+        android:enabled="false"
+        />
+
+    <Button
+        android:id="@+id/runModel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/run_the_model"
+        android:layout_gravity="center"
+        android:padding="16dp"
+        android:enabled="false"
+        />
+
+<!--    <Button-->
+<!--        android:id="@+id/imageClassButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Button"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:padding="16dp"-->
+<!--        android:enabled="false"-->
+<!-- />-->
+
+
+</LinearLayout>
