@@ -1,13 +1,20 @@
 package com.example.ortsuperresolutiondemo
 
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import ai.onnxruntime.*
 
 
 class MainActivity : AppCompatActivity(), UserInputFragment.ShowImageListener {
@@ -19,14 +26,42 @@ class MainActivity : AppCompatActivity(), UserInputFragment.ShowImageListener {
         this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                             WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(R.layout.welcome_screen)
-        Toast.makeText(this, "Content Created", Toast.LENGTH_SHORT).show()
-        
-        val buttonBegin: Button = findViewById(R.id.begin)
 
+        val buttonBegin: Button = findViewById(R.id.begin)
         buttonBegin.setOnClickListener {
-            setContentView(R.layout.activity_main)
+            if (allPermissionsGranted()) {
+                setContentView(R.layout.activity_main)
+            } else {
+                ActivityCompat.requestPermissions(
+                    this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+                )
+            }
         }
 
+    }
+
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionsGranted()) {
+                setContentView(R.layout.activity_main)
+            } else {
+                Toast.makeText(
+                    this,
+                    "Permissions not granted by the user.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+            }
+        }
     }
 
     override fun showImage(resolution: String?, bitmap: Bitmap?) {
@@ -43,5 +78,9 @@ class MainActivity : AppCompatActivity(), UserInputFragment.ShowImageListener {
         }
     }
 
+    companion object {
+        private const val REQUEST_CODE_PERMISSIONS = 10
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
 }
 
