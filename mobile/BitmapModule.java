@@ -7,15 +7,21 @@ import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class BitmapModule extends ReactContextBaseJavaModule {
 
@@ -33,7 +39,8 @@ public class BitmapModule extends ReactContextBaseJavaModule {
         try {
             WritableNativeMap result = new WritableNativeMap();
             WritableNativeArray pixels = new WritableNativeArray();
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getCurrentActivity().getContentResolver(), Uri.parse(filePath));
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(this.getCurrentActivity()).getContentResolver(), Uri.parse(filePath));
+
             if (bitmap == null) {
                 promise.reject("Failed to decode. Path is incorrect or image is corrupted");
                 return;
@@ -64,4 +71,24 @@ public class BitmapModule extends ReactContextBaseJavaModule {
 
     }
 
+    @ReactMethod
+    public void getImageUri(ReadableArray arrayPixels, final Promise promise) {
+        try {
+            int[] arrayIntPixels = new int[224*224*3*3];
+            for (int i = 0; i < arrayPixels.size(); i++) {
+                arrayIntPixels[i] = arrayPixels.getInt(i);
+            }
+            WritableNativeMap result = new WritableNativeMap();
+            Bitmap bitmap = Bitmap.createBitmap(672, 672, Bitmap.Config.ARGB_8888);
+            bitmap.copyPixelsFromBuffer(IntBuffer.wrap(arrayIntPixels));
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(getReactApplicationContext().getContentResolver(), bitmap, "Output", null);
+            result.putString("uri", (Uri.parse(path)).toString());
+
+            promise.resolve(result);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
 }
