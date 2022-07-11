@@ -15,9 +15,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 
+import androidx.annotation.NonNull;
+
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -29,6 +33,7 @@ public class BitmapModule extends ReactContextBaseJavaModule {
         super(reactContext);
     }
 
+    @NonNull
     @Override
     public String getName() {
         return "Bitmap";
@@ -42,7 +47,7 @@ public class BitmapModule extends ReactContextBaseJavaModule {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(Objects.requireNonNull(this.getCurrentActivity()).getContentResolver(), Uri.parse(filePath));
 
             if (bitmap == null) {
-                promise.reject("Failed to decode. Path is incorrect or image is corrupted");
+                promise.reject(new NullPointerException("No Bitmap Selected"));
                 return;
             }
 
@@ -84,7 +89,7 @@ public class BitmapModule extends ReactContextBaseJavaModule {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
             String path = MediaStore.Images.Media.insertImage(getReactApplicationContext().getContentResolver(), bitmap, "Output", null);
-            result.putString("uri", (Uri.parse(path)).toString());
+            result.putString("uri", path);
 
             promise.resolve(result);
         } catch (Exception e) {
