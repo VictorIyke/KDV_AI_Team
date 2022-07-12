@@ -29,7 +29,7 @@ public class BitmapReactPackage implements ReactPackage {
     public List<NativeModule> createNativeModules(
             @NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new BitmapModule(reactContext));
+        modules.add(new BitmapModuleTemp(reactContext));
 
         return modules;
     }
