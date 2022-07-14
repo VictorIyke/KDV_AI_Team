@@ -9,7 +9,8 @@ import { Asset } from 'expo-asset';
 import { pixelsRGBToYCbCr, pixelsYCbCrToRGB } from './pixelator';
 import { FlipType } from 'expo-image-manipulator';
 
-let myModel: ort.InferenceSession;
+let model: ort.InferenceSession;
+let isLoaded = false;
 let floatPixelsY = new Float32Array()
 let floatPixelsCb = new Float32Array()
 let floatPixelsCr = new Float32Array()
@@ -23,18 +24,18 @@ const bitmapModule = NativeModules.Bitmap
 export default function App() {
   const [selectedImage, setSelectedImage] = useState<any>(null);
   const [outputImage, setOutputImage] = useState<any>(null);
-
+  const [myModel, setModel] = useState(model);
 
   async function openImagePickerAsync() {
   
-    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
   
     if (permissionResult.granted === false) {
       alert("Permission to access Camera Roll is Required!");
       return;
     }
 
-    let pickerResult = await ImagePicker.launchImageLibraryAsync();
+    const pickerResult = await ImagePicker.launchImageLibraryAsync();
     
     if (pickerResult.cancelled === true) {
       return;
@@ -98,11 +99,8 @@ export default function App() {
   };
 
 
-  async function postprocess(floatArray: Array<number>): Promise<string> {
-    
-
+  async function postprocess(floatArray: Array<number>): Promise<string> {  
     const intArray = Array(postImgHeight*postImgWidth);
-
     floatArray.forEach((value, index) => {
       intArray[index] = pixelsYCbCrToRGB(value, floatPixelsCb[index], floatPixelsCr[index])
     })
@@ -128,12 +126,10 @@ export default function App() {
       if (!modelUri) {
         Alert.alert('failed to get model URI', `${assets[0]}`);
       } else {
-        myModel = await ort.InferenceSession.create(modelUri);
+        setModel(await ort.InferenceSession.create(modelUri));
+        return
 
-        Alert.alert(
-          'model loaded successfully',
-          `input names: ${myModel.inputNames}, output names: ${myModel.outputNames}`);
-      }
+        }
 
     } catch (e) {
       Alert.alert('failed to load model', `${e}`);
@@ -166,13 +162,16 @@ export default function App() {
     }
   };
 
+  if (!isLoaded) {
+    loadModel().then(() => {
+      isLoaded = true;
+    })
+    
+  } 
 
   return (
     <View style={styles.container}>
-      <Text>using ONNX Runtime for React Native</Text>
-      
-      <Button title='Upload' onPress={openImagePickerAsync}></Button>
-      <Button title='Load model' onPress={loadModel}></Button>
+      <Text style={styles.item}>Using ONNX Runtime for React Native</Text>
       {
         selectedImage !== null &&
         <Image
@@ -187,8 +186,12 @@ export default function App() {
         />
       
       }
-      <Button title='Run' onPress={runModel}></Button>
-
+      <View style={styles.userInput}>
+        <Button title='Upload Image' onPress={openImagePickerAsync} color="#219ebc"/>
+        {isLoaded && selectedImage !== null &&
+          <Button title='Process Image' onPress={runModel} color="#219ebc"/>
+        }
+      </View>
       <StatusBar style="auto" />
     </View>
   );
@@ -198,8 +201,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
+    backgroundColor: '#ffb703',
+    alignItems: 'stretch',
     justifyContent: 'center',
   },
   item: {
@@ -209,12 +212,19 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   thumbnail: {
+    alignSelf: "center",
     margin: 8,
     width: 300,
     height: 300,
     resizeMode: "contain"
   },
+  userInput: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 16,
+    alignItems: "center",
+    backgroundColor: "#111111"
+  },
 });
-
 
 
