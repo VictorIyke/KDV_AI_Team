@@ -7,7 +7,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import * as ort from 'onnxruntime-react-native';
 import { Asset } from 'expo-asset';
 import { pixelsRGBToYCbCr, pixelsYCbCrToRGB } from './pixelator';
-import { FlipType } from 'expo-image-manipulator';
+
 
 let model: ort.InferenceSession;
 let isLoaded = false;
@@ -18,6 +18,7 @@ const [imgHeight, imgWidth] = [224, 224]
 const [postImgHeight, postImgWidth] = [imgHeight*3, imgWidth*3]
 let bitmapPixel: number[] = Array(imgHeight*imgWidth);
 let bitmapScaledPixel: number[] = Array(imgHeight*imgWidth);
+
 const bitmapModule = NativeModules.Bitmap
 
 
@@ -54,6 +55,7 @@ export default function App() {
     )
 
     bitmapPixel = await bitmapModule.getPixels(imageResult.uri).then(
+
       (image: any) => {
         return Array.from(image.pixels);
       }
@@ -112,7 +114,7 @@ export default function App() {
     )
     const imageRotated = await ImageManipulator.manipulateAsync(imageUri, [
       {rotate: 90},
-      {flip: FlipType.Horizontal}
+      {flip: ImageManipulator.FlipType.Horizontal}
     ])
     setOutputImage({ localUri: imageRotated.uri })
     return imageUri
@@ -126,6 +128,7 @@ export default function App() {
       if (!modelUri) {
         Alert.alert('failed to get model URI', `${assets[0]}`);
       } else {
+        console.log(modelUri)
         setModel(await ort.InferenceSession.create(modelUri));
         return
 
