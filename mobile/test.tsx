@@ -9,70 +9,56 @@ let gl: OffscreenCanvasRenderingContext2D | null
 let isLoaded = false
 let bitmapPixels: Float32Array
 let bitmapScaledPixels: Float32Array
-let initial = document.getElementById("selectedImage") as HTMLImageElement
+let small = document.getElementById("smallImage") as HTMLImageElement
+let big = document.getElementById("bigImage") as HTMLImageElement
 
 
 export default function App() {
   const [selectedImage, setSelectedImage] = useState<any>(null);
-  let imageId = initial
+  let [imageSmall, imageBig] = [small, big]
 
   useEffect(() => {
     if (!isLoaded) {
-    initial = document.getElementById("selectedImage") as HTMLImageElement
-    if (initial) {
-      imageId = initial
-      isLoaded = true
-          }     }
+      small = document.getElementById("smallImage") as HTMLImageElement
+      big = document.getElementById("bigImage") as HTMLImageElement
+      if (small && big) {
+        imageSmall = small
+        imageBig = big
+        isLoaded = true
+            }     }
   })
 
   async function draw() {
       const offscreen = new OffscreenCanvas(1000, 1000)
       gl = offscreen.getContext('2d')
+
+
+
       if (selectedImage != null && gl) {
           console.log("GL loaded")
-          const imageResult = await ImageManipulator.manipulateAsync(
-            selectedImage.localUri, [
-              {resize: {height: 224, width: 224}}
-            ], { format: ImageManipulator.SaveFormat.PNG}
-          )
-          imageId.src = imageResult.uri
-          imageId.height = imageResult.height
-          imageId.width = imageResult.width
 
-          gl.drawImage(imageId, 0, 0)
+
+
+          gl.drawImage(imageSmall, 0, 0, 224, 224)
           const myImageData = gl.getImageData(0, 0, 224, 224)
-          gl.clearRect(0, 0, 224, 224)
           bitmapPixels = Float32Array.from(myImageData.data)
+          gl.clearRect(0, 0, 224, 224)
 
-          
-          const imageScaledResult = await ImageManipulator.manipulateAsync(
-            selectedImage.localUri, [
-              {resize: {height: 672, width: 672}}
-            ], { format: ImageManipulator.SaveFormat.PNG}
-          )
-          imageId.src = imageScaledResult.uri
-          imageId.height = imageScaledResult.height
-          imageId.width = imageScaledResult.width
 
-          gl.drawImage(imageId, 0, 0)
+
+     
+          gl.drawImage(imageBig, 0, 0, 672, 672)
           const myImageScaledData = gl.getImageData(0, 0, 672, 672)
           gl.clearRect(0, 0, 672, 672)
           bitmapScaledPixels = Float32Array.from(myImageScaledData.data)
           }
-      }
-  
-  
-  async function preprocess() {
-    
-    while (bitmapPixels.reduce((prevSum, value) => prevSum + value, 0) == 0 ||
-          bitmapScaledPixels.reduce((prevSum, value) => prevSum + value, 0) == 0) {
-            await draw()
-    }
-    // await draw()
-    console.log(bitmapPixels)
-    console.log(bitmapScaledPixels)
 
+          console.log(bitmapPixels)
+          console.log(bitmapScaledPixels)
+      
       }
+  
+
 
   async function openImagePickerAsync() {
   
@@ -104,16 +90,18 @@ export default function App() {
 
   return(
       <View style={styles.container}>
-          <canvas id='canvas' width="150" height="150">
-              {selectedImage &&
-                <img id='selectedImage' src={selectedImage.localUri} width="150" height="150" alt='' />
+        <canvas>
+          {selectedImage &&
+            <View>
+              <img id='smallImage' src={selectedImage.localUri} width="150" height="150" alt='' />
+              <img id='bigImage' src={selectedImage.localUri} width="150" height="150" alt='' />
+            </View>
           }
           </canvas>
           <Text>Hello There</Text>
           <Button title='Upload Picture' onPress={openImagePickerAsync}></Button>
           {selectedImage != null &&
           <Button title='Draw' onPress={draw}></Button>}
-          <Button title='pre' onPress={preprocess}></Button>
           {
         selectedImage !== null &&
         <Image
